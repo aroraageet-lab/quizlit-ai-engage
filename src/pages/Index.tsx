@@ -117,126 +117,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Simple Pricing</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Start free and upgrade as you grow
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-2xl">Free</CardTitle>
-                <div className="text-4xl font-bold mt-4">$0</div>
-                <p className="text-muted-foreground">Perfect to get started</p>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span className="text-sm">Up to 5 quizzes</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span className="text-sm">50 participants per session</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span className="text-sm">Basic AI generation</span>
-                </div>
-                <Link to="/auth" className="block mt-6">
-                  <Button variant="outline" className="w-full">Get Started</Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="border-primary shadow-lg hover:shadow-xl transition-shadow relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
-                Popular
-              </div>
-              <CardHeader>
-                <CardTitle className="text-2xl">Pro</CardTitle>
-                <div className="text-4xl font-bold mt-4">$19</div>
-                <p className="text-muted-foreground">For professionals</p>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span className="text-sm">Unlimited quizzes</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span className="text-sm">Unlimited participants</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span className="text-sm">Advanced AI features</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span className="text-sm">Custom branding</span>
-                </div>
-                <Link to="/auth" className="block mt-6">
-                  <Button className="w-full bg-gradient-primary">Get Started</Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-2xl">Enterprise</CardTitle>
-                <div className="text-4xl font-bold mt-4">Custom</div>
-                <p className="text-muted-foreground">For organizations</p>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span className="text-sm">Everything in Pro</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span className="text-sm">Priority support</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span className="text-sm">Dedicated account manager</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span className="text-sm">Custom integrations</span>
-                </div>
-                <Button variant="outline" className="w-full mt-6">Contact Sales</Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
       {/* For Educators Section */}
       <section id="educators" className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
@@ -287,18 +167,18 @@ const Index = () => {
                 </ul>
               </div>
               <div className="bg-card p-8 rounded-2xl shadow-lg">
-                <div className="text-center">
+              <div className="text-center">
                   <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-4">
                     <Sparkles className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium text-primary">Education Discount</span>
+                    <span className="text-sm font-medium text-primary">100% Free</span>
                   </div>
-                  <h3 className="text-2xl font-bold mb-2">50% Off for Teachers</h3>
+                  <h3 className="text-2xl font-bold mb-2">Free for Everyone</h3>
                   <p className="text-muted-foreground mb-6">
-                    Special pricing for verified educators and educational institutions
+                    QuizLit is completely free for all educators and organizations
                   </p>
                   <Link to="/auth">
                     <Button className="bg-gradient-primary">
-                      Get Educator Access
+                      Get Started Free
                       <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>
                   </Link>
