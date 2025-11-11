@@ -20,29 +20,15 @@ serve(async (req) => {
 
     console.log(`Generating ${questionCount} quiz questions on topic: ${topic}, difficulty: ${difficulty}`);
 
-    const systemPrompt = `You are a quiz question generator. Generate EXACTLY ${questionCount} multiple-choice quiz questions on the topic "${topic}" at ${difficulty} difficulty level. 
-    
-Return a JSON array of questions with this exact structure:
-{
-  "questions": [
-    {
-      "question_text": "Question here?",
-      "option_a": "First option",
-      "option_b": "Second option",
-      "option_c": "Third option",
-      "option_d": "Fourth option",
-      "correct_answer": "A"
-    }
-  ]
-}
+    const systemPrompt = `You are an expert quiz question generator. Create EXACTLY ${questionCount} high-quality, educational multiple-choice questions about "${topic}" at ${difficulty} difficulty level.
 
 Requirements:
 - Generate EXACTLY ${questionCount} questions
-- Each question must have 4 options (A, B, C, D)
-- Mark one correct answer (A, B, C, or D)
-- Make questions clear and educational
-- Ensure difficulty matches ${difficulty} level
-- Return ONLY valid JSON, no extra text`;
+- Each question must have 4 distinct options (A, B, C, D)
+- Mark one correct answer using the letter (A, B, C, or D)
+- Questions should be clear, accurate, and educational
+- Difficulty: ${difficulty === 'easy' ? 'Simple, foundational concepts' : difficulty === 'medium' ? 'Moderate complexity, requires understanding' : 'Advanced, challenging concepts'}
+- Vary the correct answer position (don't always make it option A)`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -53,10 +39,46 @@ Requirements:
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Generate ${questionCount} quiz questions about ${topic}` }
+          { 
+            role: 'system', 
+            content: systemPrompt 
+          },
+          { 
+            role: 'user', 
+            content: `Generate ${questionCount} quiz questions about: ${topic}` 
+          }
         ],
-        temperature: 0.8,
+        tools: [
+          {
+            type: 'function',
+            function: {
+              name: 'generate_quiz_questions',
+              description: 'Generate quiz questions with multiple choice options',
+              parameters: {
+                type: 'object',
+                properties: {
+                  questions: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        question_text: { type: 'string', description: 'The question text' },
+                        option_a: { type: 'string', description: 'First option' },
+                        option_b: { type: 'string', description: 'Second option' },
+                        option_c: { type: 'string', description: 'Third option' },
+                        option_d: { type: 'string', description: 'Fourth option' },
+                        correct_answer: { type: 'string', enum: ['A', 'B', 'C', 'D'], description: 'The correct answer letter' }
+                      },
+                      required: ['question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_answer']
+                    }
+                  }
+                },
+                required: ['questions']
+              }
+            }
+          }
+        ],
+        tool_choice: { type: 'function', function: { name: 'generate_quiz_questions' } }
       }),
     });
 
@@ -79,18 +101,31 @@ Requirements:
     }
 
     const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
-    
-    console.log('AI Response:', aiResponse);
+    console.log('AI Response received');
 
-    // Parse the JSON response
+    // Extract structured output from tool call
     let parsedQuestions;
     try {
-      // Try to extract JSON if wrapped in markdown code blocks
-      const jsonMatch = aiResponse.match(/```json\n?([\s\S]*?)\n?```/) || 
-                       aiResponse.match(/```\n?([\s\S]*?)\n?```/);
-      const jsonStr = jsonMatch ? jsonMatch[1] : aiResponse;
-      parsedQuestions = JSON.parse(jsonStr);
+      const toolCall = data.choices[0].message.tool_calls?.[0];
+      if (toolCall && toolCall.function) {
+        const functionArgs = JSON.parse(toolCall.function.arguments);
+        parsedQuestions = functionArgs;
+      } else {
+        // Fallback to content parsing if tool call not present
+        const aiResponse = data.choices[0].message.content;
+        console.log('Fallback to content parsing');
+        const jsonMatch = aiResponse.match(/```json\n?([\s\S]*?)\n?```/) || 
+                         aiResponse.match(/```\n?([\s\S]*?)\n?```/);
+        const jsonStr = jsonMatch ? jsonMatch[1] : aiResponse;
+        parsedQuestions = JSON.parse(jsonStr);
+      }
+      
+      // Validate we got the expected number of questions
+      if (!parsedQuestions.questions || parsedQuestions.questions.length !== questionCount) {
+        console.warn(`Expected ${questionCount} questions, got ${parsedQuestions.questions?.length || 0}`);
+      }
+      
+      console.log(`Successfully generated ${parsedQuestions.questions.length} questions`);
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
       throw new Error('Failed to parse AI-generated questions');
