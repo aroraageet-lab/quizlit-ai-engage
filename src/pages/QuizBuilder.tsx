@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Save, Plus, Trash2, GripVertical } from "lucide-react";
-import AIQuizGenerator from "@/components/AIQuizGenerator";
 import Navbar from "@/components/Navbar";
 
 interface Question {
@@ -207,19 +206,6 @@ const QuizBuilder = () => {
     setQuestions(updated);
   };
 
-  const handleAIGenerated = (generatedQuestions: any[]) => {
-    const newQuestions = generatedQuestions.map((q, index) => ({
-      question_text: q.question_text,
-      option_a: q.option_a,
-      option_b: q.option_b,
-      option_c: q.option_c,
-      option_d: q.option_d,
-      correct_answer: q.correct_answer,
-      order_index: questions.length + index,
-    }));
-
-    setQuestions([...questions, ...newQuestions]);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
@@ -265,8 +251,6 @@ const QuizBuilder = () => {
             </div>
           </CardContent>
         </Card>
-
-        <AIQuizGenerator onQuestionsGenerated={handleAIGenerated} />
 
         <div className="space-y-6">
           <div className="flex justify-between items-center">
