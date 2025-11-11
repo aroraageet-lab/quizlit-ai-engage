@@ -15,6 +15,7 @@ import Join from "./pages/Join";
 import Practice from "./pages/Practice";
 import SessionStart from "./pages/SessionStart";
 import SessionPresent from "./pages/SessionPresent";
+import SessionResults from "./pages/SessionResults";
 import Participate from "./pages/Participate";
 import NotFound from "./pages/NotFound";
 
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/participate/:sessionId" element={<Participate />} />
           <Route path="/session/new/:quizId" element={<SessionStart />} />
           <Route path="/session/:sessionId/present" element={<SessionPresent />} />
+          <Route path="/session/:sessionId/results" element={<SessionResults />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
