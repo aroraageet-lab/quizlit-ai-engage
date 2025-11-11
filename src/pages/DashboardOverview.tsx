@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, Users, Clock, TrendingUp, Plus, History as HistoryIcon, User, Lock, Mail } from "lucide-react";
+import { BookOpen, Users, Clock, TrendingUp, Plus, History as HistoryIcon, User, Lock, Mail, Sparkles, PlayCircle, BarChart3, Zap } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 
 interface Stats {
   totalQuizzes: number;
@@ -211,47 +212,176 @@ const DashboardOverview = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-4xl font-bold mb-2">Dashboard Overview</h2>
-          <p className="text-muted-foreground">
-            Welcome back, {userName}! Here's what's happening with your quizzes.
-          </p>
+      {/* Hero Welcome Section */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 border border-primary/20">
+        <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))]" />
+        <div className="relative px-8 py-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Welcome Back
+                </Badge>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+                Hello, <span className="text-primary">{userName}</span>!
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl">
+                Ready to create engaging quizzes? Your dashboard is your command center for interactive learning.
+              </p>
+            </div>
+            <Link to="/quiz/new">
+              <Button size="lg" className="bg-gradient-primary shadow-glow text-lg px-8 py-6 h-auto">
+                <Plus className="w-6 h-6 mr-2" />
+                Create New Quiz
+              </Button>
+            </Link>
+          </div>
         </div>
-        <Link to="/quiz/new">
-          <Button size="lg" className="bg-gradient-primary shadow-glow">
-            <Plus className="w-5 h-5 mr-2" />
-            Create Quiz
-          </Button>
-        </Link>
       </div>
 
-      {/* User Profile Card */}
-      <Card className="border-primary/20">
+      {/* Stats Grid */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Your Statistics</h2>
+          <Link to="/dashboard/reports">
+            <Button variant="ghost" size="sm">
+              View All Reports
+              <BarChart3 className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i} className="animate-pulse">
+                <CardHeader>
+                  <div className="h-6 bg-muted rounded w-3/4" />
+                </CardHeader>
+                <CardContent>
+                  <div className="h-12 bg-muted rounded w-1/2" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {statCards.map((card) => (
+              <Card 
+                key={card.title} 
+                className="hover:shadow-lg hover:scale-105 transition-all duration-200 border-l-4 border-l-transparent hover:border-l-primary"
+              >
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {card.title}
+                  </CardTitle>
+                  <div className={`p-3 rounded-xl ${card.bgColor}`}>
+                    <card.icon className={`h-6 w-6 ${card.color}`} />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-bold mb-1">{card.value}</div>
+                  {card.subtitle && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {card.subtitle}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Quick Actions Grid */}
+      <div className="grid md:grid-cols-3 gap-6">
+        <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-primary/20 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="relative">
+            <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center mb-3 shadow-glow">
+              <Plus className="w-6 h-6 text-white" />
+            </div>
+            <CardTitle className="text-xl">Create Quiz</CardTitle>
+            <CardDescription>Build your custom quiz with AI or manually</CardDescription>
+          </CardHeader>
+          <CardContent className="relative">
+            <Link to="/quiz/new" className="block">
+              <Button className="w-full bg-gradient-primary group-hover:shadow-glow transition-all">
+                Get Started
+                <Zap className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-secondary/20 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="relative">
+            <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-3 border border-green-500/30">
+              <PlayCircle className="w-6 h-6 text-green-600" />
+            </div>
+            <CardTitle className="text-xl">Start Session</CardTitle>
+            <CardDescription>Launch a live quiz session with participants</CardDescription>
+          </CardHeader>
+          <CardContent className="relative">
+            <Link to="/dashboard/quizzes" className="block">
+              <Button variant="outline" className="w-full border-green-500/30 hover:bg-green-500/10">
+                View My Quizzes
+                <BookOpen className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-accent/20 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="relative">
+            <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center mb-3 border border-orange-500/30">
+              <HistoryIcon className="w-6 h-6 text-orange-600" />
+            </div>
+            <CardTitle className="text-xl">View History</CardTitle>
+            <CardDescription>Check past sessions and analytics</CardDescription>
+          </CardHeader>
+          <CardContent className="relative">
+            <Link to="/dashboard/history" className="block">
+              <Button variant="outline" className="w-full border-orange-500/30 hover:bg-orange-500/10">
+                Session History
+                <BarChart3 className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Account Settings Card */}
+      <Card className="border-primary/20 bg-gradient-to-br from-muted/30 to-transparent">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <User className="w-5 h-5" />
-            My Profile
+            <User className="w-5 h-5 text-primary" />
+            Account Settings
           </CardTitle>
-          <CardDescription>Manage your account settings</CardDescription>
+          <CardDescription>Manage your profile and security</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="flex items-center gap-2 text-muted-foreground">
-                <User className="w-4 h-4" />
+              <Label className="flex items-center gap-2 text-muted-foreground text-xs">
+                <User className="w-3 h-3" />
                 Username
               </Label>
-              <div className="px-3 py-2 bg-muted/50 rounded-lg font-medium">
+              <div className="px-4 py-3 bg-background/50 rounded-lg font-medium border">
                 {userName}
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="w-4 h-4" />
-                Email
+              <Label className="flex items-center gap-2 text-muted-foreground text-xs">
+                <Mail className="w-3 h-3" />
+                Email Address
               </Label>
-              <div className="px-3 py-2 bg-muted/50 rounded-lg font-medium">
+              <div className="px-4 py-3 bg-background/50 rounded-lg font-medium border">
                 {userEmail}
               </div>
             </div>
@@ -260,7 +390,7 @@ const DashboardOverview = () => {
           <div className="pt-2">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="w-full sm:w-auto">
+                <Button variant="outline" className="w-full sm:w-auto border-primary/30 hover:bg-primary/5">
                   <Lock className="w-4 h-4 mr-2" />
                   Change Password
                 </Button>
@@ -318,91 +448,6 @@ const DashboardOverview = () => {
           </div>
         </CardContent>
       </Card>
-
-      {loading ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader>
-                <div className="h-6 bg-muted rounded w-3/4" />
-              </CardHeader>
-              <CardContent>
-                <div className="h-12 bg-muted rounded w-1/2" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {statCards.map((card) => (
-            <Card key={card.title} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {card.title}
-                </CardTitle>
-                <div className={`p-2 rounded-lg ${card.bgColor}`}>
-                  <card.icon className={`h-5 w-5 ${card.color}`} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{card.value}</div>
-                {card.subtitle && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {card.subtitle}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Link to="/quiz/new" className="block">
-              <Button variant="outline" className="w-full justify-start">
-                <Plus className="w-4 h-4 mr-2" />
-                Create New Quiz
-              </Button>
-            </Link>
-            <Link to="/dashboard/quizzes" className="block">
-              <Button variant="outline" className="w-full justify-start">
-                <BookOpen className="w-4 h-4 mr-2" />
-                View All Quizzes
-              </Button>
-            </Link>
-            <Link to="/dashboard/history" className="block">
-              <Button variant="outline" className="w-full justify-start">
-                <HistoryIcon className="w-4 h-4 mr-2" />
-                View Session History
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Getting Started</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="text-sm text-muted-foreground">
-              <p className="mb-3">
-                Welcome to QuizLit! Here's how to get started:
-              </p>
-              <ol className="list-decimal list-inside space-y-2">
-                <li>Create your first quiz with questions</li>
-                <li>Start a live session to get a 6-digit code</li>
-                <li>Share the code with participants</li>
-                <li>View real-time responses and results</li>
-              </ol>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 };
