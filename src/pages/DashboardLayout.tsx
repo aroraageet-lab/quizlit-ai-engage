@@ -21,27 +21,25 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <>
       <Navbar />
       
       <SidebarProvider>
-        <div className="flex min-h-screen w-full pt-16">
+        <div className="flex w-full">
           <DashboardSidebar />
           
-          <main className="flex-1">
-            <header className="sticky top-16 z-10 border-b bg-card/80 backdrop-blur-sm">
-              <div className="container mx-auto px-4 py-3 flex items-center">
-                <SidebarTrigger className="mr-4" />
-              </div>
+          <main className="flex-1 min-h-screen pt-16 bg-gradient-subtle">
+            <header className="border-b bg-card/80 backdrop-blur-sm px-4 py-3 flex items-center">
+              <SidebarTrigger />
             </header>
             
-            <div className="container mx-auto px-4 py-8">
+            <div className="p-6">
               <Outlet />
             </div>
           </main>
         </div>
       </SidebarProvider>
-    </div>
+    </>
   );
 };
 
