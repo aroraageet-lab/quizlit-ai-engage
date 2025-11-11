@@ -41,6 +41,23 @@ const Navbar = () => {
     return false;
   };
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    if (path.startsWith("/#")) {
+      e.preventDefault();
+      const id = path.substring(2);
+      const element = document.getElementById(id);
+      if (location.pathname === "/") {
+        element?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        navigate("/");
+        setTimeout(() => {
+          document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
+      setIsOpen(false);
+    }
+  };
+
   const publicNavLinks = [
     { name: "Home", path: "/" },
     { name: "Features", path: "/#features" },
@@ -70,7 +87,7 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
-              <Link key={link.path} to={link.path}>
+              <Link key={link.path} to={link.path} onClick={(e) => handleNavClick(e, link.path)}>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -141,7 +158,7 @@ const Navbar = () => {
                     <Link 
                       key={link.path} 
                       to={link.path} 
-                      onClick={() => setIsOpen(false)}
+                      onClick={(e) => handleNavClick(e, link.path)}
                     >
                       <Button
                         variant="ghost"
