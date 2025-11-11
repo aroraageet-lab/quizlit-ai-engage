@@ -7,9 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Sparkles, Plus, Trash2, GripVertical } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Save, Plus, Trash2, GripVertical } from "lucide-react";
 import AIQuizGenerator from "@/components/AIQuizGenerator";
+import Navbar from "@/components/Navbar";
 
 interface Question {
   id?: string;
@@ -223,27 +223,20 @@ const QuizBuilder = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link to="/dashboard">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-primary" />
-              <h1 className="text-2xl font-bold">
-                {isEdit ? "Edit Quiz" : "Create Quiz"}
-              </h1>
-            </div>
-          </div>
+      <Navbar />
+      
+      {/* Secondary Header with Save Button */}
+      <div className="border-b bg-card/30 sticky top-16 z-10">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <h1 className="text-xl font-bold">
+            {isEdit ? "Edit Quiz" : "Create Quiz"}
+          </h1>
           <Button onClick={handleSave} disabled={saving} className="bg-gradient-primary">
             <Save className="w-4 h-4 mr-2" />
             {saving ? "Saving..." : "Save Quiz"}
           </Button>
         </div>
-      </header>
+      </div>
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <Card className="mb-8">
