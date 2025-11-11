@@ -25,15 +25,15 @@ const DashboardLayout = () => {
       <Navbar />
       
       <SidebarProvider>
-        <div className="flex w-full">
+        <div className="flex w-full pt-16">
           <DashboardSidebar />
           
-          <main className="flex-1 min-h-screen pt-16 bg-gradient-subtle">
-            <header className="border-b bg-card/80 backdrop-blur-sm px-4 py-3 flex items-center">
+          <main className="flex-1 min-h-screen bg-gradient-subtle">
+            <header className="sticky top-16 z-10 border-b bg-card/80 backdrop-blur-sm px-6 py-3 flex items-center">
               <SidebarTrigger />
             </header>
             
-            <div className="p-6 max-w-7xl mx-auto">
+            <div className="px-6 py-6 max-w-7xl mx-auto">
               <Outlet />
             </div>
           </main>
