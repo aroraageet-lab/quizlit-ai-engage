@@ -86,8 +86,8 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link key={link.path} to={link.path} onClick={(e) => handleNavClick(e, link.path)}>
+            {navLinks.map((link, index) => (
+              <Link key={`${link.path}-${index}`} to={link.path} onClick={(e) => handleNavClick(e, link.path)}>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -154,9 +154,9 @@ const Navbar = () => {
               <div className="flex flex-col gap-6 mt-6">
                 {/* Mobile Navigation Links */}
                 <div className="flex flex-col gap-1">
-                  {navLinks.map((link) => (
+                  {navLinks.map((link, index) => (
                     <Link 
-                      key={link.path} 
+                      key={`${link.path}-${index}`} 
                       to={link.path} 
                       onClick={(e) => handleNavClick(e, link.path)}
                     >
