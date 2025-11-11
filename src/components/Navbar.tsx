@@ -63,11 +63,13 @@ const Navbar = () => {
     { name: "Features", path: "/#features" },
     { name: "How It Works", path: "/#how-it-works" },
     { name: "For Educators", path: "/#educators" },
+    { name: "Practice", path: "/practice" },
   ];
 
   const userNavLinks = [
     { name: "Dashboard", path: "/dashboard" },
     { name: "My Quizzes", path: "/dashboard" },
+    { name: "Practice", path: "/practice" },
     { name: "Create Quiz", path: "/quiz/new" },
     { name: "Join Quiz", path: "/join" },
   ];

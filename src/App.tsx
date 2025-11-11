@@ -8,6 +8,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import QuizBuilder from "./pages/QuizBuilder";
 import Join from "./pages/Join";
+import Practice from "./pages/Practice";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/practice" element={<Practice />} />
           <Route path="/quiz/new" element={<QuizBuilder />} />
           <Route path="/quiz/:id/edit" element={<QuizBuilder />} />
           <Route path="/join" element={<Join />} />
