@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,7 @@ interface Question {
 }
 
 const Practice = () => {
+  const navigate = useNavigate();
   const [topic, setTopic] = useState("");
   const [difficulty, setDifficulty] = useState("medium");
   const [questionCount, setQuestionCount] = useState("10");
@@ -31,7 +33,39 @@ const Practice = () => {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState<boolean[]>([]);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const { toast } = useToast();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to access the Practice page",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+    
+    setCheckingAuth(false);
+  };
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleGenerate = async () => {
     if (!topic.trim()) {

@@ -68,7 +68,7 @@ const Navbar = () => {
 
   const userNavLinks = [
     { name: "Dashboard", path: "/dashboard" },
-    { name: "My Quizzes", path: "/dashboard" },
+    { name: "My Quizzes", path: "/dashboard/quizzes" },
     { name: "Practice", path: "/practice" },
     { name: "Create Quiz", path: "/quiz/new" },
     { name: "Join Quiz", path: "/join" },

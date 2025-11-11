@@ -56,6 +56,12 @@ const SessionResults = () => {
   const [questionStats, setQuestionStats] = useState<QuestionStats[]>([]);
   const [totalParticipants, setTotalParticipants] = useState(0);
   const [averageScore, setAverageScore] = useState(0);
+  const [leaderboard, setLeaderboard] = useState<Array<{
+    name: string;
+    score: number;
+    total: number;
+    percentage: number;
+  }>>([]);
 
   useEffect(() => {
     fetchResultsData();
@@ -138,6 +144,30 @@ const SessionResults = () => {
       const avgScore = participantScores.reduce((sum, score) => sum + score, 0) / participantScores.length;
       setAverageScore(Math.round(avgScore));
     }
+
+    // Calculate leaderboard
+    const participantScores = new Map<string, { correct: number, total: number }>();
+    
+    responses.forEach(response => {
+      const name = response.participant_name || 'Anonymous';
+      const existing = participantScores.get(name) || { correct: 0, total: 0 };
+      participantScores.set(name, {
+        correct: existing.correct + (response.is_correct ? 1 : 0),
+        total: existing.total + 1
+      });
+    });
+
+    const leaderboardData = Array.from(participantScores.entries())
+      .map(([name, data]) => ({
+        name,
+        score: data.correct,
+        total: data.total,
+        percentage: (data.correct / data.total) * 100
+      }))
+      .sort((a, b) => b.percentage - a.percentage)
+      .slice(0, 10); // Top 10 participants
+
+    setLeaderboard(leaderboardData);
 
     // Calculate per-question statistics
     const stats: QuestionStats[] = questions.map(question => {
@@ -285,6 +315,59 @@ const SessionResults = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Leaderboard */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Award className="w-5 h-5 text-primary" />
+              Leaderboard - Top Performers
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {leaderboard.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No participant data available
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {leaderboard.map((participant, index) => (
+                  <div
+                    key={index}
+                    className={`flex items-center justify-between p-4 rounded-lg border ${
+                      index === 0 ? 'bg-gradient-to-r from-yellow-500/10 to-transparent border-yellow-500/20' :
+                      index === 1 ? 'bg-gradient-to-r from-gray-400/10 to-transparent border-gray-400/20' :
+                      index === 2 ? 'bg-gradient-to-r from-orange-600/10 to-transparent border-orange-600/20' :
+                      'bg-muted/30'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold ${
+                        index === 0 ? 'bg-yellow-500 text-white' :
+                        index === 1 ? 'bg-gray-400 text-white' :
+                        index === 2 ? 'bg-orange-600 text-white' :
+                        'bg-muted text-muted-foreground'
+                      }`}>
+                        {index + 1}
+                      </div>
+                      <div>
+                        <div className="font-medium">{participant.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {participant.score} / {participant.total} correct
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-primary">
+                        {participant.percentage.toFixed(0)}%
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Overall Correct/Incorrect Distribution */}
         <Card className="mb-8">
