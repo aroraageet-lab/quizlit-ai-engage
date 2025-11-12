@@ -47,10 +47,10 @@ export function DashboardSidebar() {
                     <NavLink 
                       to={item.url} 
                       end 
-                      className="hover:bg-muted/50" 
-                      activeClassName="bg-muted text-primary font-medium"
+                      className="flex items-center gap-3 hover:bg-muted/50 transition-colors" 
+                      activeClassName="border-l-4 border-l-primary bg-primary/10 text-primary font-semibold"
                     >
-                      <item.icon className="mr-2 h-4 w-4" />
+                      <item.icon className="h-4 w-4 flex-shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>

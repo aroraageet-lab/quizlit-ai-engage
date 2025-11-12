@@ -6,15 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, Users, Clock, TrendingUp, Plus, History as HistoryIcon, User, Lock, Mail, Sparkles, PlayCircle, BarChart3, Zap } from "lucide-react";
+import { BookOpen, Users, Clock, TrendingUp, Plus, History as HistoryIcon, User, Lock, Mail, PlayCircle, BarChart3, Zap } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 
 interface Stats {
   totalQuizzes: number;
   totalSessions: number;
   totalResponses: number;
   recentSessions: number;
+}
+
+interface Quiz {
+  id: string;
+  title: string;
+  created_at: string;
 }
 
 const DashboardOverview = () => {
@@ -32,11 +37,14 @@ const DashboardOverview = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [recentQuizzes, setRecentQuizzes] = useState<Quiz[]>([]);
+  const [quizzesLoading, setQuizzesLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchUserData();
     fetchStats();
+    fetchRecentQuizzes();
   }, []);
 
   const fetchUserData = async () => {
@@ -117,6 +125,27 @@ const DashboardOverview = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRecentQuizzes = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('quizzes')
+        .select('id, title, created_at')
+        .eq('created_by', user.id)
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      if (error) throw error;
+      setRecentQuizzes(data || []);
+    } catch (error: any) {
+      console.error('Error fetching recent quizzes:', error);
+    } finally {
+      setQuizzesLoading(false);
     }
   };
 
@@ -211,44 +240,33 @@ const DashboardOverview = () => {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Hero Welcome Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 border border-primary/20">
-        <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))]" />
-        <div className="relative px-8 py-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Welcome Back
-                </Badge>
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                Hello, <span className="text-primary">{userName}</span>!
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-2xl">
-                Ready to create engaging quizzes? Your dashboard is your command center for interactive learning.
-              </p>
-            </div>
-            <Link to="/quiz/new">
-              <Button size="lg" className="bg-gradient-primary shadow-glow text-lg px-8 py-6 h-auto">
-                <Plus className="w-6 h-6 mr-2" />
-                Create New Quiz
-              </Button>
-            </Link>
-          </div>
+    <div className="space-y-6">
+      {/* Compact Hero Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Welcome back, <span className="text-primary">{userName}</span>
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your quizzes and track your session performance
+          </p>
         </div>
+        <Link to="/quiz/new">
+          <Button className="bg-gradient-primary shadow-md hover:shadow-lg transition-shadow">
+            <Plus className="w-4 h-4 mr-2" />
+            Create New Quiz
+          </Button>
+        </Link>
       </div>
 
       {/* Stats Grid */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Your Statistics</h2>
+          <h2 className="text-xl font-semibold">Statistics</h2>
           <Link to="/dashboard/reports">
-            <Button variant="ghost" size="sm">
-              View All Reports
-              <BarChart3 className="w-4 h-4 ml-2" />
+            <Button variant="ghost" size="sm" className="text-xs">
+              View Reports
+              <BarChart3 className="w-3 h-3 ml-2" />
             </Button>
           </Link>
         </div>
@@ -267,22 +285,22 @@ const DashboardOverview = () => {
             ))}
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {statCards.map((card) => (
               <Card 
                 key={card.title} 
-                className="hover:shadow-lg hover:scale-105 transition-all duration-200 border-l-4 border-l-transparent hover:border-l-primary"
+                className="hover:shadow-md transition-shadow duration-200"
               >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                  <CardTitle className="text-xs font-medium text-muted-foreground">
                     {card.title}
                   </CardTitle>
-                  <div className={`p-3 rounded-xl ${card.bgColor}`}>
-                    <card.icon className={`h-6 w-6 ${card.color}`} />
+                  <div className={`p-2 rounded-lg ${card.bgColor}`}>
+                    <card.icon className={`h-4 w-4 ${card.color}`} />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-4xl font-bold mb-1">{card.value}</div>
+                  <div className="text-2xl font-bold mb-1">{card.value}</div>
                   {card.subtitle && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Clock className="w-3 h-3" />
@@ -296,60 +314,114 @@ const DashboardOverview = () => {
         )}
       </div>
 
+      {/* Recent Quizzes Section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Recent Quizzes</h2>
+          <Link to="/dashboard/quizzes">
+            <Button variant="ghost" size="sm" className="text-xs">
+              View All
+              <BookOpen className="w-3 h-3 ml-2" />
+            </Button>
+          </Link>
+        </div>
+
+        {quizzesLoading ? (
+          <div className="grid md:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="animate-pulse">
+                <CardHeader>
+                  <div className="h-5 bg-muted rounded w-3/4 mb-2" />
+                  <div className="h-4 bg-muted rounded w-1/2" />
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        ) : recentQuizzes.length > 0 ? (
+          <div className="grid md:grid-cols-3 gap-4">
+            {recentQuizzes.map((quiz) => (
+              <Card key={quiz.id} className="hover:shadow-md transition-shadow group">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base line-clamp-1">{quiz.title}</CardTitle>
+                  <CardDescription className="text-xs">
+                    Created {new Date(quiz.created_at).toLocaleDateString()}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <Link to={`/session/start/${quiz.id}`}>
+                    <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                      <PlayCircle className="w-3 h-3 mr-2" />
+                      Start Session
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-8">
+              <BookOpen className="w-12 h-12 text-muted-foreground/50 mb-3" />
+              <p className="text-muted-foreground text-sm mb-4">No quizzes yet</p>
+              <Link to="/quiz/new">
+                <Button size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Your First Quiz
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
       {/* Quick Actions Grid */}
-      <div className="grid md:grid-cols-3 gap-6">
-        <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-primary/20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          <CardHeader className="relative">
-            <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center mb-3 shadow-glow">
-              <Plus className="w-6 h-6 text-white" />
+      <div className="grid md:grid-cols-3 gap-4">
+        <Card className="group hover:shadow-md transition-shadow border-l-4 border-l-primary/50">
+          <CardHeader className="pb-3">
+            <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center mb-2">
+              <Plus className="w-5 h-5 text-white" />
             </div>
-            <CardTitle className="text-xl">Create Quiz</CardTitle>
-            <CardDescription>Build your custom quiz with AI or manually</CardDescription>
+            <CardTitle className="text-base">Create Quiz</CardTitle>
+            <CardDescription className="text-xs">Build custom quizzes</CardDescription>
           </CardHeader>
-          <CardContent className="relative">
+          <CardContent className="pt-0">
             <Link to="/quiz/new" className="block">
-              <Button className="w-full bg-gradient-primary group-hover:shadow-glow transition-all">
+              <Button size="sm" className="w-full bg-gradient-primary">
                 Get Started
-                <Zap className="w-4 h-4 ml-2" />
               </Button>
             </Link>
           </CardContent>
         </Card>
 
-        <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-secondary/20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          <CardHeader className="relative">
-            <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-3 border border-green-500/30">
-              <PlayCircle className="w-6 h-6 text-green-600" />
+        <Card className="group hover:shadow-md transition-shadow border-l-4 border-l-green-500/50">
+          <CardHeader className="pb-3">
+            <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center mb-2 border border-green-500/30">
+              <PlayCircle className="w-5 h-5 text-green-600" />
             </div>
-            <CardTitle className="text-xl">Start Session</CardTitle>
-            <CardDescription>Launch a live quiz session with participants</CardDescription>
+            <CardTitle className="text-base">Start Session</CardTitle>
+            <CardDescription className="text-xs">Launch live quiz</CardDescription>
           </CardHeader>
-          <CardContent className="relative">
+          <CardContent className="pt-0">
             <Link to="/dashboard/quizzes" className="block">
-              <Button variant="outline" className="w-full border-green-500/30 hover:bg-green-500/10">
-                View My Quizzes
-                <BookOpen className="w-4 h-4 ml-2" />
+              <Button size="sm" variant="outline" className="w-full">
+                My Quizzes
               </Button>
             </Link>
           </CardContent>
         </Card>
 
-        <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-accent/20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          <CardHeader className="relative">
-            <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center mb-3 border border-orange-500/30">
-              <HistoryIcon className="w-6 h-6 text-orange-600" />
+        <Card className="group hover:shadow-md transition-shadow border-l-4 border-l-orange-500/50">
+          <CardHeader className="pb-3">
+            <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center mb-2 border border-orange-500/30">
+              <HistoryIcon className="w-5 h-5 text-orange-600" />
             </div>
-            <CardTitle className="text-xl">View History</CardTitle>
-            <CardDescription>Check past sessions and analytics</CardDescription>
+            <CardTitle className="text-base">View History</CardTitle>
+            <CardDescription className="text-xs">Past sessions</CardDescription>
           </CardHeader>
-          <CardContent className="relative">
+          <CardContent className="pt-0">
             <Link to="/dashboard/history" className="block">
-              <Button variant="outline" className="w-full border-orange-500/30 hover:bg-orange-500/10">
+              <Button size="sm" variant="outline" className="w-full">
                 Session History
-                <BarChart3 className="w-4 h-4 ml-2" />
               </Button>
             </Link>
           </CardContent>
@@ -357,13 +429,13 @@ const DashboardOverview = () => {
       </div>
 
       {/* Account Settings Card */}
-      <Card className="border-primary/20 bg-gradient-to-br from-muted/30 to-transparent">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <User className="w-5 h-5 text-primary" />
             Account Settings
           </CardTitle>
-          <CardDescription>Manage your profile and security</CardDescription>
+          <CardDescription className="text-xs">Manage your profile and security</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
